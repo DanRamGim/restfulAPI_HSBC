@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>
+    Booking
+  </title>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
+    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <script src="vendor/jquery-validation/dist/jquery.validate.min.js"></script>
+  <div class="container">
+    <form style="height: 50%;vertical-align:middle; padding-top: 10%;">
+      <div class="form-group text-center">
+        <button id="client" type="button" style="margin-left:auto; margin-right:auto;"
+          class="btn btn-primary">Customer</button>
+        <button id="employee" type="button" style="margin-left:10%; margin-right:auto;"
+          class="btn btn-primary">Restaurant Owner</button>
+      </div>
+    </form>
+    <form method="post" action="" id="clientwindow" style="display: none;">
+      <div style="height: 50%;vertical-align:middle; padding-top: 10%;">
+        <button type="button" id="clientreturn" style="margin-left:auto; margin-right:auto;"
+          class="btn btn-secondary">Return</button>
+          <h1 class="text-center" style="padding-bottom: 5%;">Please book your reservation.</h1>
+        <div class="form-group text-center">
+          <label for="Name">Name:</label>
+          <input type="text" style="width: 40%; margin-left:auto; margin-right:auto;" name="" id="name"
+            class="form-control" placeholder="">
+        </div>
+        <div class="form-group text-center">
+          <label for="TableSize">Table size:</label>
+          <input type="number" style="width: 40%; margin-left:auto; margin-right:auto;" name="" id="tablesize"
+            class="form-control" placeholder="">
+        </div>
+        <div class="form-group text-center">
+          <label for="Date">Date:</label>
+          <input type="datetime-local" style="width: 40%; margin-left:auto; margin-right:auto;" name=""
+            id="datetimeCalendar" class="form-control">
+        </div>
+        <div class="form-group text-center">
+          <button type="button" id="bookbutton" style="margin-left:auto; margin-right:auto;" class="btn btn-primary"
+            disabled>Book</button>
+        </div>
+      </div>
+    </form>
+    <form method="post" action="" id="employeewindow" style="display: none;">
+      <div style="height: 50%;vertical-align:middle; padding-top: 10%;">
+        <button type="button" id="employeereturn" style="margin-left:auto; margin-right:auto;"
+          class="btn btn-secondary">Return</button>
+          <h1 class="text-center" style="padding-bottom: 5%;">Search booking reservations by day.</h1>
+        <div class="form-group text-center">
+          <label for="Date">Date:</label>
+          <input type="date" style="width: 40%; margin-left:auto; margin-right:auto;" name="" id="dateCalendar"
+            class="form-control" placeholder="">
+        </div>
+        <div class="form-group text-center">
+          <button type="button" id="obtainbutton" style="margin-left:auto; margin-right:auto;"
+            class="btn btn-primary">Obtain</button>
+        </div>
+        <div class="form-group text-center">
+          <table class="table" id="bookedTable">
+            <thead class="thead-dark">
+              <th scope="row">Name</th>
+              <th scope="row">Table Size</th>
+              <th scope="row">Booked Date</th>
+            </thead>
+            <tbody id="bookedBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script>
+
+
+    $(document).ready(function () {
+
+      //Controls the first two buttons to show and hide the Forms and the Back button under the two type of users
+      $("#name").on("change", function () {
+        if ($(this).val() == "" || $('#tablesize').val() == '') {
+          $('#bookbutton').prop('disabled', true);
+        } else {
+          $('#bookbutton').prop('disabled', false);
+        }
+      });
+
+      $("#tablesize").on("change", function () {
+        if ($(this).val() == "" || $('#name').val() == '') {
+          $('#bookbutton').prop('disabled', true);
+        } else {
+          $('#bookbutton').prop('disabled', false);
+        }
+      });
+
+      $('#client').click(function () {
+        $('#clientwindow').show();
+        $('#client').hide();
+        $('#employee').hide();
+      })
+      $('#employee').click(function () {
+        $('#employeewindow').show();
+        $('#client').hide();
+        $('#employee').hide();
+      })
+      $('#employeereturn').click(function () {
+        $('#employeewindow').hide();
+        $('#clientwindow').hide();
+        $('#client').show();
+        $('#employee').show();
+      })
+      $('#clientreturn').click(function () {
+        $('#employeewindow').hide();
+        $('#clientwindow').hide();
+        $('#client').show();
+        $('#employee').show();
+      })
+
+      //obtain the specific Booking day from the database
+      $('#obtainbutton').click(function () {
+
+        $.ajax({
+          type: "POST",
+          url: $(location).attr("origin") + "/obtain",
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify({
+            "bookedDate": $('#dateCalendar').val()
+          }),
+          success: function (data) {
+
+            //Clear the table and populate it with an iteration through the results,
+            $('#bookedTable tbody').empty();
+              $(data).each(function (i, booked) {
+                var Month = booked.BookedDate.month
+                Month = Month+1;
+                var extraCeroMonth = '';
+                var extraCeroDay = '';
+                var extraCeroHour = '';
+                var extraCeroMinute = '';
+                if(Month < 10){extraCeroMonth = '0'}
+                if(booked.BookedDate.dayOfMonth < 10){extraCeroDay = '0'}
+                if(booked.BookedDate.hourOfDay < 10){extraCeroHour = '0'}
+                if(booked.BookedDate.minute < 10){extraCeroMinute = '0'}
+              $('#bookedTable').append($("<tr>")
+                .append($("<td>").append(booked.CustomerName))
+                .append($("<td>").append(booked.TableSize))
+                .append($("<td>").append(booked.BookedDate.year+"/"+extraCeroMonth+Month+"/"+extraCeroDay+booked.BookedDate.dayOfMonth+" "+extraCeroHour+booked.BookedDate.hourOfDay+":"+extraCeroMinute+booked.BookedDate.minute)));
+             });
+          },
+          error: function (data) {
+            alert("Please enter a valid date.");
+          },
+          cache: false
+        });
+
+      });
+
+      //Add a new registry into the database table booking
+      //!!!The date saved on the database is on UTC!!!
+      $('#bookbutton').click(function () {
+        var dt = new Date($('#datetimeCalendar').val());
+        
+        $.ajax({
+          type: "POST",
+          url: $(location).attr("origin") + "/create",
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify({
+            "customerName": $('#name').val(),
+            "tableSize": $('#tablesize').val(),
+            "bookedDate": dt.toUTCString()
+          }),
+          success: function (data) {
+            alert(data.responseText);
+
+          },
+          error: function (data) {
+            alert(data.responseText);
+          },
+          cache: false
+        });
+
+      });
+    });
+  </script>
+</body>
+
+</html>
