@@ -7,6 +7,9 @@ import com.HSBC.restfulAPI.Booking.Booking;
 import com.HSBC.restfulAPI.Booking.BookingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import io.muserver.*;
 import io.muserver.handlers.ResourceHandlerBuilder;
 
@@ -19,10 +22,12 @@ public class RestfulApiApplication {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		// SpringApplication.run(RestfulApiApplication.class, args);
 
-		
+			Path currRelativePath = Paths.get("");
+        	String currAbsolutePathString = currRelativePath.toAbsolutePath().toString();
 			MuServer server = MuServerBuilder.httpServer()
-            .addHandler(ResourceHandlerBuilder.fileHandler("C:\\Users\\danra\\Documents\\Visual Studio Code\\restfulAPI\\src\\main\\resources\\templates"))
+            .addHandler(ResourceHandlerBuilder.fileHandler(currAbsolutePathString+"\\src\\main\\resources\\templates"))
 			.addHandler(Method.POST, "/obtain", (request, response, pathParams) -> {
 				String jsonobtained = "";
 				ObjectMapper objectMapper = new ObjectMapper();

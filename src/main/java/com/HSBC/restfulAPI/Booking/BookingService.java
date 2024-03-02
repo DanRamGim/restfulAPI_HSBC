@@ -1,9 +1,11 @@
 package com.HSBC.restfulAPI.Booking;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -30,7 +32,11 @@ public class BookingService {
     @SuppressWarnings("null")
     public String createBooking(Booking book)
     {
-        
+        var currentDateinstance = Calendar.getInstance();
+        var differenceCurrentDate = currentDateinstance.getTimeInMillis()-book.getBookedDate().getTimeInMillis();
+        if (differenceCurrentDate > 0) {
+            return "The booking date needs to be in the future, please try with a different date";
+        }
         var allDates = bookingRepo.findAll();
         boolean notbooked = true;
         if(!IsNullOrEmpty(allDates))
